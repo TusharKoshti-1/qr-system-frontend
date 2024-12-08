@@ -15,9 +15,9 @@ router.get('/api/menu', (req, res) => {
 
 // API to add a new menu item
 router.post('/api/add-item', (req, res) => {
-  const { name, price } = req.body;
-  const query = 'INSERT INTO menu (name, price) VALUES (?, ?)';
-  connection.query(query, [name, price], (err, result) => {
+  const { name, image, price } = req.body;
+  const query = 'INSERT INTO menu (name, image, price) VALUES (?, ?, ?)';
+  connection.query(query, [name, image, price || 0], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Database error');
@@ -37,6 +37,19 @@ router.put('/api/update-item/:id', (req, res) => {
       return res.status(500).send('Database error');
     }
     res.json({ message: 'Menu item updated successfully' });
+  });
+});
+
+// API to delete a menu item
+router.delete('/api/delete-item/:id', (req, res) => {
+  const { id } = req.params;
+  const query = 'DELETE FROM menu WHERE id = ?';
+  connection.query(query, [id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+    res.json({ message: 'Menu item deleted successfully' });
   });
 });
 
