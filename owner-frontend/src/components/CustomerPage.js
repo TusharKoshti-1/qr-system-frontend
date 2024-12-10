@@ -37,11 +37,44 @@ const CustomerPage = () => {
   };
 
   const handleAddItem = (item) => {
-    setSelectedItems([...selectedItems, item]);
+    const existingItem = selectedItems.find((selectedItem) => selectedItem.id === item.id);
+    if (existingItem) {
+      setSelectedItems(
+        selectedItems.map((selectedItem) =>
+          selectedItem.id === item.id
+            ? { ...selectedItem, quantity: selectedItem.quantity + 1 }
+            : selectedItem
+        )
+      );
+    } else {
+      setSelectedItems([...selectedItems, { ...item, quantity: 1 }]);
+    }
   };
 
   const handleRemoveItem = (item) => {
     setSelectedItems(selectedItems.filter((selectedItem) => selectedItem.id !== item.id));
+  };
+
+  const handleIncreaseQuantity = (item) => {
+    setSelectedItems(
+      selectedItems.map((selectedItem) =>
+        selectedItem.id === item.id
+          ? { ...selectedItem, quantity: selectedItem.quantity + 1 }
+          : selectedItem
+      )
+    );
+  };
+
+  const handleDecreaseQuantity = (item) => {
+    if (item.quantity > 1) {
+      setSelectedItems(
+        selectedItems.map((selectedItem) =>
+          selectedItem.id === item.id
+            ? { ...selectedItem, quantity: selectedItem.quantity - 1 }
+            : selectedItem
+        )
+      );
+    }
   };
 
   const handleSubmitOrder = async () => {
@@ -55,6 +88,7 @@ const CustomerPage = () => {
         id: item.id,
         name: item.name,
         price: item.price,
+        quantity: item.quantity,
       }));
       await axios.post("http://localhost:5000/api/place-order", {
         name,
@@ -126,7 +160,9 @@ const CustomerPage = () => {
             <ul>
               {selectedItems.map((item) => (
                 <li key={item.id}>
-                  {item.name} - ₹{item.price}
+                  {item.name} - ₹{item.price} x {item.quantity}
+                  <button onClick={() => handleIncreaseQuantity(item)}>+</button>
+                  <button onClick={() => handleDecreaseQuantity(item)}>-</button>
                   <button onClick={() => handleRemoveItem(item)}>Remove</button>
                 </li>
               ))}

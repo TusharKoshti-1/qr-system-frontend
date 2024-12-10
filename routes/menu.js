@@ -15,9 +15,9 @@ router.get('/api/menu', (req, res) => {
 
 // API to add a new menu item
 router.post('/api/add-item', (req, res) => {
-  const { name, image, price } = req.body;
-  const query = 'INSERT INTO menu (name, image, price) VALUES (?, ?, ?)';
-  connection.query(query, [name, image, price || 0], (err, result) => {
+  const { name, image, price, category } = req.body;
+  const query = 'INSERT INTO menu (name, image, price, category) VALUES (?, ?, ?, ?)';
+  connection.query(query, [name, image, price || 0, category], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Database error');

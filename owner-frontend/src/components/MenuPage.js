@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./MenuPage.css";
 import { Link } from "react-router-dom";
-
+import "./MenuPage.css";
 
 const styles = {
   button: {
@@ -17,13 +16,15 @@ const styles = {
   },
 };
 
-
 const MenuPage = () => {
   const [menuItems, setMenuItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [editingItemId, setEditingItemId] = useState(null);
-  const [newRate, setNewRate] = useState("")
+  const [newRate, setNewRate] = useState("");
 
-  // Fetch menu items from the backend
+  // Fetch menu items and categories from the backend
   useEffect(() => {
     fetchMenuItems();
   }, []);
@@ -32,8 +33,26 @@ const MenuPage = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/menu");
       setMenuItems(response.data);
+      setFilteredItems(response.data);
+
+      // Extract unique categories from the data
+      const uniqueCategories = [
+        ...new Set(response.data.map((item) => item.category)),
+      ];
+      setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching menu items:", error);
+    }
+  };
+
+  const handleCategoryFilter = (category) => {
+    setSelectedCategory(category);
+    if (category === "") {
+      setFilteredItems(menuItems); // Show all items if no category is selected
+    } else {
+      setFilteredItems(
+        menuItems.filter((item) => item.category === category)
+      );
     }
   };
 
@@ -59,15 +78,30 @@ const MenuPage = () => {
   };
 
   return (
-    
     <div className="menu-page">
       <h2>Menu</h2>
-      <div style={{ margin: "20px" }}>
+      <div className="menu-controls">
         <Link to="/add-menu">
           <button style={styles.button}>Add Menu Items</button>
-        </Link></div>
+        </Link>
+
+        {/* Category Filter Dropdown */}
+        <select
+          value={selectedCategory}
+          onChange={(e) => handleCategoryFilter(e.target.value)}
+          className="category-filter"
+        >
+          <option value="">All Categories</option>
+          {categories.map((category, index) => (
+            <option key={index} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="menu-list">
-        {menuItems.map((item) => (
+        {filteredItems.map((item) => (
           <div key={item.id} className="menu-item">
             <img src={item.image} alt={item.name} className="menu-image" />
             <p>{item.name}</p>
@@ -89,15 +123,22 @@ const MenuPage = () => {
                 </button>
               </div>
             ) : (
-              <button onClick={() => { setEditingItemId(item.id); setNewRate(""); }}>
+              <button
+                onClick={() => {
+                  setEditingItemId(item.id);
+                  setNewRate("");
+                }}
+              >
                 Set Rate
               </button>
             )}
 
             {/* Remove item button */}
             <button
-            className="remove-btn" 
-            onClick={() => handleRemoveItem(item.id)}>Remove
+              className="remove-btn"
+              onClick={() => handleRemoveItem(item.id)}
+            >
+              Remove
             </button>
           </div>
         ))}
