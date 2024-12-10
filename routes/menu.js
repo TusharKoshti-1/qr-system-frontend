@@ -53,4 +53,15 @@ router.delete('/api/delete-item/:id', (req, res) => {
   });
 });
 
+router.get('/api/categories', (req, res) => {
+  const query = 'SELECT DISTINCT category FROM menu';
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching categories:', err);
+      return res.status(500).send('Database error');
+    }
+    res.json(results.map(row => row.category)); // Extract the category names
+  });
+});
+
 module.exports = router;
