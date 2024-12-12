@@ -185,3 +185,63 @@
     width: 100%;
   }
 }
+
+/* Buttons Styling for Cart Section */
+.cart-item .item-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.cart-item .quantity-btn {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cart-item .quantity-btn:hover {
+  background-color: #0056b3;
+}
+
+.cart-item .remove-btn {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cart-item .remove-btn:hover {
+  background-color: #c82333;
+}
+
+/* General Styling for List Items */
+.cart-item .item-details {
+  flex-grow: 1;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.cart-summary ul {
+  padding: 0;
+  list-style: none;
+}
+
+.cart-summary li {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+

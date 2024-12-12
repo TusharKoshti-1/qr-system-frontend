@@ -36,7 +36,7 @@ const AddMenuItem = () => {
         "https://www.dropbox.com/scl/fi/l8sl6wrb62lwkxbmhkagr/manchow-soup.jpg?rlkey=eih9ye7v8mgtuka5b4dn8hsoc&st=vfg3rnc5&raw=1",
     },
     {
-      id: 4,
+      id: 5,
       name: "Punjabi Thali",
       category: "Punjabi",
       image: "https://www.dropbox.com/scl/fi/zgfgpm7oxbbnyoh400zce/Punjabi-thali.jpg?rlkey=urcix329kbh1amq7g4uvgyy4o&st=u3urfkr9&raw=1",
