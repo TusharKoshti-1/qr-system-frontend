@@ -7,6 +7,8 @@ import AddOrder from "./components/AddOrder";
 import PendingOrders from "./components/PendingOrders";
 import AddMenuItem from "./components/AddMenuItem";
 import Sales from "./components/Sales";
+import CartPage from "./components/CartPage";
+import LandingPage from "./components/LandingPage";
 import CustomerPage from "./components/CustomerPage"; // Import the new Sales component
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <Route path="/add-menu" element={<AddMenuItem />} />
         <Route path="/add-order" element={<AddOrder />} />
         <Route path="/customer" element={<CustomerPage/>} />
+        <Route path="/cartpage" element={<CartPage/>}/>
+        <Route path="/customerform" element={<LandingPage/>}/>
         <Route path="/sales" element={<Sales />} /> {/* New Sales Route */}
       </Routes>
     </Router>
