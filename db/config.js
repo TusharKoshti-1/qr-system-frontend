@@ -1,9 +1,9 @@
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'your_username',
-  password: 'your_password',
+  host: 'sql307.infinityfree.com',
+  user: 'if0_37905014',
+  password: '9824243834',
   database: 'qr_ordering_system'
 });
 
