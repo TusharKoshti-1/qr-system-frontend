@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./CartPage.css";
 
 const CartPage = () => {
@@ -44,10 +45,24 @@ const CartPage = () => {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
-  const handleCashPayment = () => {
-    alert("Your order will be processed. Please pay with cash.");
-    navigate("/thankyou", { state: { name, phone, items, total: calculateTotal(), payment: "Cash" } });
+  const handleCashPayment = async () => {
+    const total = calculateTotal();
+    try {
+      await axios.post("http://localhost:5000/api/orders", {
+        customer_name: name,
+        phone,
+        items,
+        total_amount: total,
+        payment_method: "Cash",
+      });
+      alert("Your order has been placed successfully! Please pay with cash at the counter.");
+      navigate("/thankyou", { state: { name, phone, items, total, payment: "Cash" } });
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("Failed to place order. Please try again.");
+    }
   };
+  
 
   const handleOnlinePayment = () => {
     alert("Redirecting to online payment gateway...");

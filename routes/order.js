@@ -1,34 +1,49 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../db/config');
+const connection = require("../db/config");
 
-// Place an order
-router.post('/', (req, res) => {
-  const { table_id, menu_items, total_price } = req.body;
-  const sql = "INSERT INTO orders (table_id, menu_items, total_price, status) VALUES (?, ?, ?, 'pending')";
-  db.query(sql, [table_id, JSON.stringify(menu_items), total_price], (err) => {
-    if (err) return res.status(500).json(err);
-    res.status(200).json({ message: 'Order placed successfully!' });
-  });
+// Add a new order
+router.post('/api/orders', (req, res) => {
+  const { customer_name, phone, items, total_amount, payment_method } = req.body;
+  const query = `
+    INSERT INTO orders (customer_name, phone, items, total_amount, payment_method, status)
+    VALUES (?, ?, ?, ?, ?, 'Pending')
+  `;
+  connection.query(
+    query,
+    [customer_name, phone, JSON.stringify(items), total_amount, payment_method],
+    (err, result) => {
+      if (err) {
+        console.error('Error adding order:', err);
+        return res.status(500).send('Database error');
+      }
+      res.status(201).json({ message: 'Order added successfully', orderId: result.insertId });
+    }
+  );
 });
 
 // Fetch all orders
-router.get('/', (req, res) => {
-  const sql = "SELECT * FROM orders";
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.status(200).json(results);
+router.get('/api/orders', (req, res) => {
+  connection.query('SELECT * FROM orders', (err, results) => {
+    if (err) {
+      console.error('Error fetching orders:', err);
+      return res.status(500).send('Database error');
+    }
+    res.json(results);
   });
 });
 
-// Update order status
-router.put('/:id', (req, res) => {
+// Delete an order
+router.delete("/api/orders/:id", (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-  const sql = "UPDATE orders SET status = ? WHERE id = ?";
-  db.query(sql, [status, id], (err) => {
-    if (err) return res.status(500).json(err);
-    res.status(200).json({ message: 'Order status updated successfully!' });
+  const query = "DELETE FROM orders WHERE id = ?";
+  connection.query(query, [id], (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Database error");
+    } else {
+      res.json({ message: "Order deleted successfully" });
+    }
   });
 });
 

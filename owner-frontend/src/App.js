@@ -6,6 +6,7 @@ import Menu from "./components/MenuPage";
 import AddOrder from "./components/AddOrder";
 import PendingOrders from "./components/PendingOrders";
 import AddMenuItem from "./components/AddMenuItem";
+import Home from "./components/Home";
 import Sales from "./components/Sales";
 import CartPage from "./components/CartPage";
 import LandingPage from "./components/LandingPage";
@@ -16,7 +17,8 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<PendingOrders />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/pending-orders" element={<PendingOrders />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/add-menu" element={<AddMenuItem />} />
         <Route path="/add-order" element={<AddOrder />} />
