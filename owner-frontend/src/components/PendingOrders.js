@@ -1,134 +1,162 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./PendingOrders.css";
 
 const PendingOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [editingOrder, setEditingOrder] = useState(null);
-  const [updatedItems, setUpdatedItems] = useState([]);
+  const [aggregatedItems, setAggregatedItems] = useState([]);
+  const navigate = useNavigate();
 
+  // Aggregate items function
+  const aggregateItems = (orders) => {
+    const itemMap = {};
+
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
+        if (itemMap[item.name]) {
+          itemMap[item.name].quantity += item.quantity;
+        } else {
+          itemMap[item.name] = {
+            name: item.name,
+            quantity: item.quantity,
+          };
+        }
+      });
+    });
+
+    const aggregatedList = Object.values(itemMap);
+    setAggregatedItems(aggregatedList);
+  };
+
+  // Fetch orders and sort them
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/orders");
-        setOrders(response.data);
+        const pendingOrders = response.data.filter((order) => order.status === "Pending");
+
+        // Sort orders by creation time (most recent first)
+        const sortedOrders = pendingOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        setOrders(sortedOrders);
+        aggregateItems(sortedOrders); // Aggregate items based on sorted orders
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     };
+
     fetchOrders();
-  }, []);
 
-  const handleMarkCompleted = async (id) => {
-    try {
-      await axios.put(`http://localhost:5000/api/orders/${id}`, { status: "Completed" });
-      setOrders(orders.map(order => order.id === id ? { ...order, status: "Completed" } : order));
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
-  };
+    // Set up WebSocket connection
+    const ws = new WebSocket("ws://localhost:5001");
 
-  const handleDeleteOrder = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/orders/${id}`);
-      setOrders(orders.filter(order => order.id !== id));
-    } catch (error) {
-      console.error("Error deleting order:", error);
-    }
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "new_order") {
+        // Prepend new order to the orders list (show it at the top)
+        setOrders((prevOrders) => {
+          // Add new order to the top and aggregate items
+          const updatedOrders = [data.order, ...prevOrders];
+          aggregateItems(updatedOrders); // Aggregate items with the new order included
+          return updatedOrders;
+        });
+      } else if (data.type === "update_order") {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.id === data.id ? { ...order, status: data.status } : order
+          )
+        );
+        aggregateItems(orders); // Recompute aggregated items after order update
+      }
+    };
+
+    return () => {
+      ws.close(); // Clean up WebSocket connection
+    };
+  }, [orders]);
+
+  const handleEditOrder = (order) => {
+    navigate("/edititems", { state: { order } });
   };
 
   const handlePrintOrder = (order) => {
     const orderDetails = `
-      Customer: ${order.customer_name}\n
-      Phone: ${order.phone}\n
-      Items: ${order.items.map(item => `${item.name} x ${item.quantity}`).join(", ")}\n
-      Total: ₹${order.total_amount}\n
+      Customer: ${order.customer_name}
+      Phone: ${order.phone}
+      Items:
+      ${order.items.map((item) => ` - ${item.name}: ₹${item.price} x ${item.quantity}`).join("\n")}
+      Total Amount: ₹${order.total_amount}
       Payment Method: ${order.payment_method}
     `;
-    window.alert(orderDetails);
-    window.print();
+    const newWindow = window.open("", "Print", "height=600,width=800");
+    newWindow.document.write(`<pre>${orderDetails}</pre>`);
+    newWindow.document.close();
+    newWindow.print();
   };
 
-  const handleEditOrder = (order) => {
-    setEditingOrder(order);
-    setUpdatedItems(order.items); // Initialize with current items
-  };
-
-  const handleSaveOrder = async (orderId) => {
+  const handleOrderComplete = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
-        items: updatedItems,
-        total_amount: updatedItems.reduce((total, item) => total + item.price * item.quantity, 0),
-      });
-      setEditingOrder(null);
-      setOrders(
-        orders.map(order =>
-          order.id === orderId ? { ...order, items: updatedItems } : order
-        )
-      );
+      await axios.put(`http://localhost:5000/api/orders/${id}`, { status: "Completed" });
+      const updatedOrders = orders.filter((order) => order.id !== id); // Remove from pending list
+      setOrders(updatedOrders);
+      aggregateItems(updatedOrders); // Recompute item totals
     } catch (error) {
-      console.error("Error saving updated order:", error);
+      console.error("Error marking order as completed:", error);
     }
-  };
-
-  const handleItemChange = (index, field, value) => {
-    setUpdatedItems(
-      updatedItems.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      )
-    );
   };
 
   return (
     <div className="pending-orders-container">
       <h2>Pending Orders</h2>
+
+      {/* Aggregated Items Section */}
+      <div className="aggregated-items-container">
+        <h3>Total Quantities</h3>
+        <ul className="aggregated-items-list">
+          {aggregatedItems.map((item, index) => (
+            <li key={index} className="aggregated-item">
+              <span className="item-name"><strong>{item.name}</strong></span>
+              <span className="quantity">{item.quantity}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className="orders-list">
         {orders.map((order) => (
           <div key={order.id} className="order-card">
             <h3>{order.customer_name}</h3>
             <p>Phone: {order.phone}</p>
             <p>Payment Method: {order.payment_method}</p>
-            <p>Total Amount: ₹{order.total_amount}</p>
-            <p>Status: {order.status}</p>
+            {/* Add Total Amount Display */}
+            <p><strong>Total Amount: ₹{order.total_amount}</strong></p>
+
             <div className="order-items">
               <h4>Items:</h4>
               <ul>
-                {editingOrder?.id === order.id
-                  ? updatedItems.map((item, index) => (
-                      <li key={index}>
-                        <input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => handleItemChange(index, "name", e.target.value)}
-                        />
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
-                        />
-                        <input
-                          type="number"
-                          value={item.price}
-                          onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                        />
-                      </li>
-                    ))
-                  : order.items.map((item, index) => (
-                      <li key={index}>
-                        {item.name} - ₹{item.price} x {item.quantity}
-                      </li>
-                    ))}
+                {order.items.map((item, index) => (
+                  <li key={index}>
+                    <span className="item-name">{item.name}</span> 
+                    <span className="item-details"> - ₹{item.price} x {item.quantity}</span>
+                  </li>
+                ))}
               </ul>
             </div>
+
             <div className="order-actions">
-              {editingOrder?.id === order.id ? (
-                <button onClick={() => handleSaveOrder(order.id)}>Save</button>
-              ) : (
-                <button onClick={() => handleEditOrder(order)}>Edit</button>
-              )}
-              <button onClick={() => handleMarkCompleted(order.id)}>Mark as Completed</button>
-              <button onClick={() => handlePrintOrder(order)}>Print</button>
-              <button onClick={() => handleDeleteOrder(order.id)}>Delete</button>
+              <button className="edit-btn" onClick={() => handleEditOrder(order)}>
+                Edit
+              </button>
+              <button className="print-btn" onClick={() => handlePrintOrder(order)}>
+                Print
+              </button>
+              <button
+                className="complete-btn"
+                onClick={() => handleOrderComplete(order.id)}
+              >
+                Order Complete
+              </button>
             </div>
           </div>
         ))}
