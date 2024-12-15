@@ -30,7 +30,8 @@ router.post('/api/orders', (req, res) => {
 
 // Fetch all orders
 router.get('/api/orders', (req, res) => {
-  connection.query('SELECT * FROM orders', (err, results) => {
+  const query = 'SELECT * FROM orders WHERE status = "Pending" ORDER BY created_at DESC';
+  connection.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching orders:', err);
       return res.status(500).send('Database error');
@@ -38,7 +39,6 @@ router.get('/api/orders', (req, res) => {
     res.json(results);
   });
 });
-
 // Update an order
 router.put("/api/orders/:id", (req, res) => {
   const orderId = req.params.id;

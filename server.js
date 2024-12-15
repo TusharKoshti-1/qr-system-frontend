@@ -4,6 +4,7 @@ const cors = require("cors");
 const WebSocket = require("ws");
 const menuRoutes = require('./routes/menu'); 
 const orderRoutes = require('./routes/order');
+const salesRoutes = require('./routes/sales')
 
 const app = express();
 app.use(cors());
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 // Route definitions
 app.use(menuRoutes);
 app.use(orderRoutes);
+app.use(salesRoutes);
 
 // Start the server
 app.listen(5000, () => {

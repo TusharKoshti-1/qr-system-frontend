@@ -1,0 +1,56 @@
+.sales-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  h1, h2 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .view-mode-buttons {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .view-mode-buttons button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  .view-mode-buttons button.active {
+    background-color: #0056b3;
+  }
+  
+  .daily-revenue, .item-wise-sales, .top-selling-items {
+    margin-bottom: 30px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 1rem;
+    text-align: center;
+  }
+  

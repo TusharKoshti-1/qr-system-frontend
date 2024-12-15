@@ -8,7 +8,7 @@ const PendingOrders = () => {
   const [aggregatedItems, setAggregatedItems] = useState([]);
   const navigate = useNavigate();
 
-  // Aggregate items function
+  // Function to aggregate items across orders
   const aggregateItems = (orders) => {
     const itemMap = {};
 
@@ -34,29 +34,23 @@ const PendingOrders = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/orders");
-        const pendingOrders = response.data.filter((order) => order.status === "Pending");
-
-        // Sort orders by creation time (most recent first)
-        const sortedOrders = pendingOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        setOrders(sortedOrders);
-        aggregateItems(sortedOrders); // Aggregate items based on sorted orders
+        setOrders(response.data);
+        aggregateItems(response.data); // Aggregate items for totals
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     };
-
+  
     fetchOrders();
-
+  
     // Set up WebSocket connection
     const ws = new WebSocket("ws://localhost:5001");
-
+  
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "new_order") {
-        // Prepend new order to the orders list (show it at the top)
+        // Prepend new order to the orders list
         setOrders((prevOrders) => {
-          // Add new order to the top and aggregate items
           const updatedOrders = [data.order, ...prevOrders];
           aggregateItems(updatedOrders); // Aggregate items with the new order included
           return updatedOrders;
@@ -70,11 +64,11 @@ const PendingOrders = () => {
         aggregateItems(orders); // Recompute aggregated items after order update
       }
     };
-
+  
     return () => {
       ws.close(); // Clean up WebSocket connection
     };
-  }, [orders]);
+  }, []);
 
   const handleEditOrder = (order) => {
     navigate("/edititems", { state: { order } });
@@ -129,21 +123,18 @@ const PendingOrders = () => {
             <h3>{order.customer_name}</h3>
             <p>Phone: {order.phone}</p>
             <p>Payment Method: {order.payment_method}</p>
-            {/* Add Total Amount Display */}
             <p><strong>Total Amount: ₹{order.total_amount}</strong></p>
-
             <div className="order-items">
               <h4>Items:</h4>
               <ul>
                 {order.items.map((item, index) => (
                   <li key={index}>
-                    <span className="item-name">{item.name}</span> 
+                    <span className="item-name">{item.name}</span>
                     <span className="item-details"> - ₹{item.price} x {item.quantity}</span>
                   </li>
                 ))}
               </ul>
             </div>
-
             <div className="order-actions">
               <button className="edit-btn" onClick={() => handleEditOrder(order)}>
                 Edit
