@@ -10,7 +10,8 @@ import Home from "./components/Home";
 import Sales from "./components/Sales";
 import CartPage from "./components/CartPage";
 import LandingPage from "./components/LandingPage";
-import CustomerPage from "./components/CustomerPage"; // Import the new Sales component
+import CustomerPage from "./components/CustomerPage";
+import EditOrder from "./components/EditOrder"; // Import the new Sales component
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/customer" element={<CustomerPage/>} />
         <Route path="/cartpage" element={<CartPage/>}/>
         <Route path="/customerform" element={<LandingPage/>}/>
+        <Route path="/edititems" element={<EditOrder/>}/>
         <Route path="/sales" element={<Sales />} /> {/* New Sales Route */}
       </Routes>
     </Router>

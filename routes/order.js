@@ -55,4 +55,38 @@ router.put("/api/orders/:id", (req, res) => {
   });
 });
 
+
+router.put("/api/updateorders/:id", (req, res) => {
+  const orderId = req.params.id;
+  const { items, total_amount } = req.body;
+
+  // Update query for updating total_amount and items
+  const query = `
+    UPDATE orders 
+    SET total_amount = ?, items = ? 
+    WHERE id = ?
+  `;
+
+  connection.query(query, [total_amount, JSON.stringify(items), orderId], (err, result) => {
+    if (err) {
+      console.error("Error updating order:", err);
+      return res.status(500).send("Database error");
+    }
+
+    // If no rows were affected, order might not exist
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Notify via WebSocket if applicable
+    const udateOrder = { id: result.insertId, items, total_amount };
+      req.wss.broadcast({ type: "update_order", order: udateOrder });
+
+
+    res.json({ message: "Order updated successfully" });
+  });
+});
+
+
+
 module.exports = router;
