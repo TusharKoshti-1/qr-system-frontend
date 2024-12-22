@@ -10,7 +10,7 @@ const Home = () => {
         <Link to="/menu">
           <button style={styles.button}>Menu</button>
         </Link>
-        <Link to="/add-order">
+        <Link to="/customerform">
           <button style={styles.button}>Add Order</button>
         </Link>
         <Link to="/sales">
@@ -38,3 +38,5 @@ const styles = {
 };
 
 export default Home;
+
+

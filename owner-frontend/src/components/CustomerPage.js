@@ -15,6 +15,7 @@ const CustomerPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch menu and categories
     const fetchMenu = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/menu");
@@ -35,9 +36,16 @@ const CustomerPage = () => {
 
     fetchMenu();
     fetchCategories();
+
+    // Retrieve selected items from sessionStorage if available
+    const savedItems = JSON.parse(sessionStorage.getItem("selectedItems"));
+    if (savedItems) {
+      setSelectedItems(savedItems);
+    }
   }, []);
 
   useEffect(() => {
+    // Calculate total whenever selectedItems change
     const calculateTotal = () => {
       const totalAmount = selectedItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -46,6 +54,13 @@ const CustomerPage = () => {
       setTotal(totalAmount);
     };
     calculateTotal();
+  }, [selectedItems]);
+
+  // Save selectedItems to sessionStorage whenever they change
+  useEffect(() => {
+    if (selectedItems.length > 0) {
+      sessionStorage.setItem("selectedItems", JSON.stringify(selectedItems));
+    }
   }, [selectedItems]);
 
   const handleAddItem = (item) => {
@@ -157,7 +172,7 @@ const CustomerPage = () => {
           {selectedItems.map((item) => (
             <li key={item.id} className="cart-item">
               <div className="item-details">
-                {item.name} <br></br>
+                {item.name} <br />
                 ₹{item.price} x {item.quantity}
               </div>
               <div className="item-actions">
