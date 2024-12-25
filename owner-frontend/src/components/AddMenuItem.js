@@ -1,55 +1,47 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
+import axios from "axios";
 import "./AddMenuItem.css"; // Update with your CSS path
 
 const AddMenuItem = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [menuItems, setMenuItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [message, setMessage] = useState("");
 
-  const sampleItems = [
-    {
-      id: 1,
-      name: "Half Dry Manchurian",
-      category: "Chinese",
-      image:
-        "https://www.dropbox.com/scl/fi/gn4o3zyrry4u9v9jmksgz/half-dry-manchurian.jpg?rlkey=a2stp1vhfwoo2dbbgcpfxyb9b&st=veyl17u8&raw=1",
-    },
-    {
-      id: 2,
-      name: "Full Dry Manchurian",
-      category: "Chinese",
-      image:
-        "https://www.dropbox.com/scl/fi/q0knd3ao02zwshsy92aky/full-dry-manchurian.jpg?rlkey=3jjhi8lntjbbemsmzgrusw89u&st=91ime393&raw=1",
-    },
-    {
-      id: 3,
-      name: "Noodles",
-      category: "Chinese",
-      image:
-        "https://www.dropbox.com/scl/fi/80qndcd6bemeltp99axar/noodles.jpg?rlkey=yn1vinqj6tg6n8nt8k0sezbi2&st=qv1sx33x&raw=1",
-    },
-    {
-      id: 4,
-      name: "Manchow Soup",
-      category: "Soups",
-      image:
-        "https://www.dropbox.com/scl/fi/l8sl6wrb62lwkxbmhkagr/manchow-soup.jpg?rlkey=eih9ye7v8mgtuka5b4dn8hsoc&st=vfg3rnc5&raw=1",
-    },
-    {
-      id: 5,
-      name: "Punjabi Thali",
-      category: "Punjabi",
-      image: "https://www.dropbox.com/scl/fi/zgfgpm7oxbbnyoh400zce/Punjabi-thali.jpg?rlkey=urcix329kbh1amq7g4uvgyy4o&st=u3urfkr9&raw=1",
-    }
-  ];
+  // Fetch menu items and categories from the backend
+  useEffect(() => {
+      fetchMenuItems();
+    }, []);
+  
+    const fetchMenuItems = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/menuitems");
+        setMenuItems(response.data);
+        setFilteredItems(response.data);
+  
+        // Extract unique categories from the data
+        const uniqueCategories = [
+          ...new Set(response.data.map((item) => item.category)),
+        ];
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching menu items:", error);
+      }
+    };
 
-  const filteredItems = sampleItems.filter((item) => {
-    const matchesName = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter
-      ? item.category.toLowerCase() === categoryFilter.toLowerCase()
-      : true;
-    return matchesName && matchesCategory;
-  });
+    const handleCategoryFilter = (category) => {
+      setSelectedCategory(category);
+      if (category === "") {
+        setFilteredItems(menuItems); // Show all items if no category is selected
+      } else {
+        setFilteredItems(
+          menuItems.filter((item) => item.category === category)
+        );
+      }
+    };
+  
 
   const addItemToMenu = async (item) => {
     try {
@@ -102,13 +94,16 @@ const AddMenuItem = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select
+          value={selectedCategory}
+          onChange={(e) => handleCategoryFilter(e.target.value)}
           className="category-filter"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="">All Categories</option>
-          <option value="Chinese">Chinese</option>
-          <option value="Soups">Soups</option>
+          {categories.map((category, index) => (
+            <option key={index} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
       </div>
       {message && <p>{message}</p>}

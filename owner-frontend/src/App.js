@@ -11,7 +11,8 @@ import Sales from "./components/Sales";
 import CartPage from "./components/CartPage";
 import LandingPage from "./components/LandingPage";
 import CustomerPage from "./components/CustomerPage";
-import EditOrder from "./components/EditOrder"; // Import the new Sales component
+import EditOrder from "./components/EditOrder";
+import MenuItemAdd from "./components/MenuItemAdd"; // Import the new Sales component
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/customer" element={<CustomerPage/>} />
         <Route path="/cartpage" element={<CartPage/>}/>
         <Route path="/customerform" element={<LandingPage/>}/>
+        <Route path="/menuitemadd" element={<MenuItemAdd/>}/>
         <Route path="/edititems" element={<EditOrder/>}/>
         <Route path="/sales" element={<Sales />} /> {/* New Sales Route */}
       </Routes>
