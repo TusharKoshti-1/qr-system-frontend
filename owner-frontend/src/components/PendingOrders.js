@@ -33,7 +33,10 @@ const PendingOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/orders");
+        const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/orders" , {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+          } });
         setOrders(response.data);
         aggregateItems(response.data); // Aggregate items for totals
       } catch (error) {
@@ -91,7 +94,10 @@ const PendingOrders = () => {
 
   const handleOrderComplete = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/orders/${id}`, { status: "Completed" });
+      await axios.put(`https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/orders/${id}`, { status: "Completed" } , {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } });
       const updatedOrders = orders.filter((order) => order.id !== id); // Remove from pending list
       setOrders(updatedOrders);
       aggregateItems(updatedOrders); // Recompute item totals

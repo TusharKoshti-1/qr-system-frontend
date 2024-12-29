@@ -17,7 +17,11 @@ const AddMenuItem = () => {
   
     const fetchMenuItems = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/menuitems");
+        const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/menuitems" , {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+          } });
+        console.log("API response: ", response.data); // Log response
         setMenuItems(response.data);
         setFilteredItems(response.data);
   
@@ -46,7 +50,10 @@ const AddMenuItem = () => {
   const addItemToMenu = async (item) => {
     try {
       // Fetch existing menu items to check for duplicates
-      const existingMenuResponse = await fetch("http://localhost:5000/api/menu");
+      const existingMenuResponse = await fetch("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/menu" , {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } });
       const existingMenu = await existingMenuResponse.json();
 
       // Check if the item is already in the menu
@@ -58,10 +65,11 @@ const AddMenuItem = () => {
       }
 
       // If the item doesn't exist, proceed to add it
-      const response = await fetch("http://localhost:5000/api/add-item", {
+      const response = await fetch("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/add-item", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify({
           name: item.name,

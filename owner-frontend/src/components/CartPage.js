@@ -48,7 +48,10 @@ const CartPage = () => {
   const handleCashPayment = async () => {
     const total = calculateTotal();
     try {
-      await axios.post("http://localhost:5000/api/orders", {
+      await axios.post("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/orders", {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } } ,{
         customer_name: name,
         phone,
         items,

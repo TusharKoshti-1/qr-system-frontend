@@ -16,7 +16,10 @@ const EditOrder = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/menu");
+        const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/menu" , {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+          } });
         setMenuItems(response.data);
       } catch (error) {
         console.error("Error fetching menu items:", error);
@@ -91,7 +94,10 @@ const EditOrder = () => {
     };
   
     try {
-      await axios.put(`http://localhost:5000/api/updateorders/${order.id}`, updatedOrder);
+      await axios.put(`https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/updateorders/${order.id}`, updatedOrder , {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } });
       navigate("/pending-orders"); // Ensure it redirects to the correct path
     } catch (error) {
       console.error("Error saving updated order:", error);

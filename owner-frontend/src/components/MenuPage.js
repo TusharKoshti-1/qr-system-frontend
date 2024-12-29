@@ -31,7 +31,10 @@ const MenuPage = () => {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/menu");
+      const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/menu" , {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        }});
       setMenuItems(response.data);
       setFilteredItems(response.data);
 
@@ -58,7 +61,10 @@ const MenuPage = () => {
 
   const handleRateChange = async (id, newRate) => {
     try {
-      await axios.put(`http://localhost:5000/api/update-item/${id}`, {
+      await axios.put(`https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/update-item/${id}`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } } , {
         price: newRate,
       });
       fetchMenuItems(); // Refresh menu after updating rate
@@ -70,7 +76,10 @@ const MenuPage = () => {
 
   const handleRemoveItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/delete-item/${id}`);
+      await axios.delete(`https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/delete-item/${id}` , {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+        } });
       fetchMenuItems(); // Refresh menu after removing item
     } catch (error) {
       console.error("Error removing item:", error);

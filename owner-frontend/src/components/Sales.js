@@ -13,13 +13,22 @@ const Sales = () => {
     const fetchSalesData = async () => {
       try {
         if (viewMode === "daily") {
-          const response = await axios.get("http://localhost:5000/api/sales/daily");
+          const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/sales/daily" , {
+            headers: {
+              'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+            } });
           setDailySales(response.data);
         } else if (viewMode === "weekly") {
-          const response = await axios.get("http://localhost:5000/api/sales/weekly");
+          const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/sales/weekly" , {
+            headers: {
+              'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+            } });
           setWeeklySales(response.data);
         } else if (viewMode === "monthly") {
-          const response = await axios.get("http://localhost:5000/api/sales/monthly");
+          const response = await axios.get("https://67f3-2409-40c1-5004-fc74-37ee-99ef-5e2b-10ad.ngrok-free.app/api/sales/monthly" , {
+            headers: {
+              'ngrok-skip-browser-warning': 'true'  // Add this header to skip the warning
+            } });
           setMonthlySales(response.data);
         }
         setError(""); // Clear any previous error
